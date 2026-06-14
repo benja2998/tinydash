@@ -2,4 +2,4 @@ build:
 	cc -o main main.c -Wextra -Wall -Werror -pedantic
 
 install: build
-	ln -sf "$(CURDIR)/main" /usr/local/bin/tinydash
+	cp -f "$(CURDIR)/main" /usr/local/bin/tinydash
