@@ -13,7 +13,7 @@
 static struct termios old_termios;
 static int old_flags;
 
-void input_init() {
+void input_init(void) {
 	struct termios new_termios;
 	tcgetattr(STDIN_FILENO, &old_termios);
 	new_termios = old_termios;
@@ -24,12 +24,12 @@ void input_init() {
 	fcntl(STDIN_FILENO, F_SETFL, old_flags | O_NONBLOCK);
 }
 
-void input_cleanup() {
+void input_cleanup(void) {
 	tcsetattr(STDIN_FILENO, TCSANOW, &old_termios);
 	fcntl(STDIN_FILENO, F_SETFL, old_flags);
 }
 
-int get_input() {
+int get_input(void) {
 	char c;
 
 	if (read(STDIN_FILENO, &c, 1) == 1) {
@@ -46,7 +46,7 @@ struct map {
 	int enm_col;
 };
 
-void clear() {
+void clear(void) {
 	printf("\033[1;1H\033[2J");
 }
 
