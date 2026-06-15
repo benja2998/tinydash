@@ -13,14 +13,48 @@
 
 static struct termios old_termios;
 static int old_flags;
+int score = 0;
 
 void clear(void);
 
-void die(void) {
+void my_exit(void) {
 	fflush(stdout);
 	clear();
 	fflush(stdout);
-	printf("Game over, you died\n");
+	char c[1025];
+
+	char filename[512];
+	char *home = getenv("HOME");
+
+	if (home == NULL) {
+		exit(1);
+	}
+
+	snprintf(filename, sizeof(filename), "%s%s", home, "/tinydash_hs");
+	
+	FILE *fptr;
+	if ((fptr = fopen(filename, "a+")) == NULL) {
+		printf("Error");
+		exit(1);
+	}
+	fscanf(fptr, "%[^\n]", c);
+	fclose(fptr);
+
+	if ((fptr = fopen(filename, "w+")) == NULL) {
+		printf("Error");
+		exit(1);
+	}
+
+	int curhs = atoi(c);
+
+	if (score > curhs) {
+		snprintf(c, 512, "%d", score);
+	}
+
+	fprintf(fptr, "%s", c);
+	
+	printf("Score: %d, High Score: %s\n", score, c);
+
 	exit(0);
 }
 
@@ -49,7 +83,7 @@ int get_input(void) {
 	return -1;
 }
 
-struct map {
+struct FrameBuffer {
 	char pixels[ROWS][COLS];
 };
 
@@ -67,7 +101,7 @@ void clear(void) {
 	printf("\033[1;1H\033[2J");
 }
 
-void map_init(struct map *m, Player *plr, Enemy *enm, Enemy *enm2) {
+void map_init(struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2) {
 	memset(m->pixels, '.', sizeof m->pixels);
 	plr->row = ROWS / 2;
 	plr->col = 0;
@@ -78,7 +112,7 @@ void map_init(struct map *m, Player *plr, Enemy *enm, Enemy *enm2) {
 	enm2->col = COLS;
 }
 
-void update_map(struct map *m, Player *plr, Enemy *enm, Enemy *enm2) {
+void update_map(struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2) {
 	memset(m->pixels, '.', sizeof m->pixels);
 
 	if (plr->row >= 0 && plr->row < ROWS && plr->col >= 0 && plr->col < COLS) {
@@ -94,7 +128,7 @@ void update_map(struct map *m, Player *plr, Enemy *enm, Enemy *enm2) {
 	}
 }
 
-void map_render(struct map *m) {
+void map_render(struct FrameBuffer *m) {
 	clear();
 	fflush(stdout);
 	for (int row = 0; row < ROWS; row++) {
@@ -106,7 +140,7 @@ void map_render(struct map *m) {
 }
 
 int main(void) {
-	struct map my_map;
+	struct FrameBuffer my_map;
 	Player plr = {0};
 	Enemy enm = {0}, enm2 = {0};
 	
@@ -125,7 +159,7 @@ int main(void) {
 		}
 
 		if (key == 'q') {
-			exit(0);
+			my_exit();
 		}
 
 		if (plr.row < ROWS / 2) {
@@ -149,13 +183,21 @@ int main(void) {
 		}
 
 		if (plr.row == enm.row && plr.col == enm.col){
-			die();
+			my_exit();
 		}
 
 		if (plr.row == enm2.row && plr.col == enm2.col) {
-			die();
+			my_exit();
 		}
 
+		if (plr.col == enm.col && plr.row != enm.row){
+			score++;
+		}
+
+		if (plr.col == enm2.col && plr.row != enm2.row) {
+			score++;
+		}
+		
 		update_map(&my_map, &plr, &enm, &enm2);
 		map_render(&my_map);
 		usleep(FRAMETIME);
