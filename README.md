@@ -4,7 +4,7 @@ tinydash is a tiny terminal-based game similar to "Geometry Dash". It uses only 
 
 ## Usage
 
-Build it with make, then run ./main. To play, press space to jump before the $ symbol hits your character, the @ symbol.
+Build it with make, then run ./main. To play, press space to jump before the E symbol hits your character, the @ symbol.
 
 ## Installing
 
