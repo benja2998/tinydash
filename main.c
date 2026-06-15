@@ -9,9 +9,20 @@
 #define ROWS 8
 #define COLS 32
 #define JUMPPOWER 4
+#define FRAMETIME 40000
 
 static struct termios old_termios;
 static int old_flags;
+
+void clear(void);
+
+void die(void) {
+	fflush(stdout);
+	clear();
+	fflush(stdout);
+	printf("Game over, you died\n");
+	exit(0);
+}
 
 void input_init(void) {
 	struct termios new_termios;
@@ -40,23 +51,47 @@ int get_input(void) {
 
 struct map {
 	char pixels[ROWS][COLS];
-	int plr_row;
-	int plr_col;
-	int enm_row;
-	int enm_col;
 };
+
+typedef struct {
+	int row;
+	int col;
+} Enemy;
+
+typedef struct {
+	int row;
+	int col;
+} Player;
 
 void clear(void) {
 	printf("\033[1;1H\033[2J");
 }
 
-void map_init(struct map *m) {
+void map_init(struct map *m, Player *plr, Enemy *enm, Enemy *enm2) {
 	memset(m->pixels, '.', sizeof m->pixels);
-	m->plr_row = ROWS / 2;
-	m->plr_col = 0;
+	plr->row = ROWS / 2;
+	plr->col = 0;
+	enm->row = ROWS / 2;
+	enm->col = COLS / 2;
 
-	m->enm_row = ROWS / 2;
-	m->enm_col = COLS;
+	enm2->row = ROWS / 2;
+	enm2->col = COLS;
+}
+
+void update_map(struct map *m, Player *plr, Enemy *enm, Enemy *enm2) {
+	memset(m->pixels, '.', sizeof m->pixels);
+
+	if (plr->row >= 0 && plr->row < ROWS && plr->col >= 0 && plr->col < COLS) {
+		m->pixels[plr->row][plr->col] = '@';
+	}
+
+	if (enm->row >= 0 && enm->row < ROWS && enm->col >= 0 && enm->col < COLS) {
+		m->pixels[enm->row][enm->col] = 'E';
+	}
+
+	if (enm2->row >= 0 && enm2->row < ROWS && enm2->col >= 0 && enm2->col < COLS) {
+		m->pixels[enm2->row][enm2->col] = 'E';
+	}
 }
 
 void map_render(struct map *m) {
@@ -64,13 +99,7 @@ void map_render(struct map *m) {
 	fflush(stdout);
 	for (int row = 0; row < ROWS; row++) {
 		for (int col = 0; col < COLS; col++) {
-			if (row == m->plr_row && col == m->plr_col) {
-				write(STDOUT_FILENO, "@", 1);
-			} else if (row == m->enm_row && col == m->enm_col) {
-				write(STDOUT_FILENO, "$", 1);
-			} else {
-				write(STDOUT_FILENO, &m->pixels[row][col], 1);
-			}
+			write(STDOUT_FILENO, &m->pixels[row][col], 1);
 		}
 		write(STDOUT_FILENO, "\n", 1);
 	}
@@ -78,7 +107,10 @@ void map_render(struct map *m) {
 
 int main(void) {
 	struct map my_map;
-	map_init(&my_map);
+	Player plr = {0};
+	Enemy enm = {0}, enm2 = {0};
+	
+	map_init(&my_map, &plr, &enm, &enm2);
 
 	input_init();
 	atexit(input_cleanup);
@@ -88,33 +120,45 @@ int main(void) {
 	while (1) {
 		int key = get_input();
 
-		if (key == ' ' && my_map.plr_row == ROWS / 2) {
-			my_map.plr_row -= JUMPPOWER;
+		if (key == ' ' && plr.row == ROWS / 2) {
+			plr.row -= JUMPPOWER;
 		}
 
-		if (my_map.plr_row < ROWS / 2) {
+		if (key == 'q') {
+			exit(0);
+		}
+
+		if (plr.row < ROWS / 2) {
 			if (slowdown == false) {
-				my_map.plr_row++;
+				plr.row++;
 				slowdown = true;
 			} else {
 				slowdown = false;
 			}
 		}
 		
-		if (my_map.enm_col > -1) {
-			my_map.enm_col--;
+		if (enm.col > -1) {
+			enm.col--;
 		} else {
-			my_map.enm_col = COLS;
+			enm.col = COLS;
 		}
-		if (my_map.enm_col == my_map.plr_col && my_map.enm_row == my_map.plr_row) {
-			fflush(stdout);
-			clear();
-			fflush(stdout);
-			printf("Game over, you died\n");
-			break;
+		if (enm2.col > -1) {
+			enm2.col--;
+		} else {
+		 	enm2.col = COLS + COLS / 2;
 		}
+
+		if (plr.row == enm.row && plr.col == enm.col){
+			die();
+		}
+
+		if (plr.row == enm2.row && plr.col == enm2.col) {
+			die();
+		}
+
+		update_map(&my_map, &plr, &enm, &enm2);
 		map_render(&my_map);
-		usleep(40000);
+		usleep(FRAMETIME);
 	}
 	return 0;
 }
