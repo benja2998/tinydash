@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <termios.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #define ROWS 8
 #define COLS 32
@@ -55,6 +56,17 @@ void my_exit(void) {
 		printf("Error");
 		exit(1);
 	}
+
+	struct stat st;
+	if (stat(filename, &st) != 0) {
+		exit(1);
+	}
+
+	int filesize = (int)st.st_size;
+	if (filesize == 0) {
+		fprintf(fptr, "0");
+	}
+	
 	fscanf(fptr, "%[^\n]", c);
 	fclose(fptr);
 
