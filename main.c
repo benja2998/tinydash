@@ -28,7 +28,8 @@
 #define ROWS 8
 #define COLS 32
 #define JUMPPOWER 4
-#define FRAMETIME 40000
+
+int frametime = 40000;
 
 static struct termios old_termios;
 static int old_flags;
@@ -224,15 +225,17 @@ int main(void) {
 
 		if (plr.col == enm.col && plr.row != enm.row){
 			score++;
+			frametime = frametime - 10;				  
 		}
 
 		if (plr.col == enm2.col && plr.row != enm2.row) {
 			score++;
+			frametime = frametime - 10;
 		}
 		
 		update_map(&my_map, &plr, &enm, &enm2);
 		map_render(&my_map);
-		usleep(FRAMETIME);
+		usleep(frametime);
 	}
 	return 0;
 }
