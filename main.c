@@ -1,20 +1,20 @@
 /*
-  tinydash - a terminal-based game
-  Copyright (C) 2026 benja2998
+   tinydash - a terminal-based game
+   Copyright (C) 2026 benja2998
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   */
 
 #include <stdlib.h>
 #include <string.h>
@@ -51,7 +51,7 @@ void my_exit(void) {
 	}
 
 	snprintf(filename, sizeof(filename), "%s%s", home, "/tinydash_hs");
-	
+
 	FILE *fptr;
 	if ((fptr = fopen(filename, "a+")) == NULL) {
 		printf("Error");
@@ -67,7 +67,7 @@ void my_exit(void) {
 	if (filesize == 0) {
 		fprintf(fptr, "0");
 	}
-	
+
 	fscanf(fptr, "%[^\n]", c);
 	fclose(fptr);
 
@@ -83,7 +83,7 @@ void my_exit(void) {
 	}
 
 	fprintf(fptr, "%s", c);
-	
+
 	printf("Score: %d, High Score: %s\n", score, c);
 
 	exit(0);
@@ -174,7 +174,7 @@ int main(void) {
 	struct FrameBuffer my_map;
 	Player plr = {0};
 	Enemy enm = {0}, enm2 = {0};
-	
+
 	map_init(&my_map, &plr, &enm, &enm2);
 
 	input_init();
@@ -203,7 +203,7 @@ int main(void) {
 				slowdown = false;
 			}
 		}
-		
+
 		if (enm.col > -1) {
 			enm.col--;
 		} else {
@@ -212,7 +212,7 @@ int main(void) {
 		if (enm2.col > -1) {
 			enm2.col--;
 		} else {
-		 	enm2.col = COLS + COLS / 2;
+			enm2.col = COLS + COLS / 2;
 		}
 
 		if (plr.row == enm.row && plr.col == enm.col){
@@ -232,7 +232,7 @@ int main(void) {
 			score++;
 			frametime = frametime - 10;
 		}
-		
+
 		update_map(&my_map, &plr, &enm, &enm2);
 		map_render(&my_map);
 		usleep(frametime);
