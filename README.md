@@ -4,7 +4,7 @@ tinydash is a tiny terminal-based game similar to "Geometry Dash". It uses only 
 
 ## Usage
 
-Build it with make, then run ./main. To play, press space to jump before the E symbol hits your character, the @ symbol.
+Build it with make, then run ./main. To play, press space to jump before the number symbols hit your character, the @ symbol.
 
 ## Installing
 
@@ -12,4 +12,4 @@ Simply run make install. You need to be root.
 
 ## Configuration
 
-Configuration can be done through editing the code.
+You can optionally add a third enemy, using make `CFLAGS=-DTHIRD_ENM`.
