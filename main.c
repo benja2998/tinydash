@@ -215,6 +215,8 @@ int main(void) {
 
     if (key == ' ' && plr.row == ROWS / 2) {
       plr.row -= JUMPPOWER;
+    } else if (key == ' ' && plr.row == ROWS + 1) {
+      plr.row -= JUMPPOWER;
     } else if (key == ' ') {
       plr.row = ROWS / 2;
     }
