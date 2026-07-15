@@ -17,6 +17,7 @@
 */
 
 #include <fcntl.h>
+#include "frame.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,18 +25,14 @@
 #include <sys/stat.h>
 #include <termios.h>
 #include <unistd.h>
-
-#define ROWS 8
-#define COLS 32
-#define JUMPPOWER 4
+#include "helpers.h"
+#include "render.h"
 
 int frametime = 40000;
 
 static struct termios old_termios;
 static int old_flags;
 int score = 0;
-
-void clear(void);
 
 void my_exit(void) {
   fflush(stdout);
@@ -114,10 +111,6 @@ int get_input(void) {
   return -1;
 }
 
-struct FrameBuffer {
-  char pixels[ROWS][COLS];
-};
-
 typedef struct {
   int row;
   int col;
@@ -127,8 +120,6 @@ typedef struct {
   int row;
   int col;
 } Player;
-
-void clear(void) { printf("\033[1;1H\033[2J"); }
 
 void map_init(struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
 #ifdef THIRD_ENM
@@ -177,17 +168,6 @@ void update_map(struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
     m->pixels[enm3->row][enm3->col] = '3';
   }
 #endif
-}
-
-void map_render(struct FrameBuffer *m) {
-  clear();
-  fflush(stdout);
-  for (int row = 0; row < ROWS; row++) {
-    for (int col = 0; col < COLS; col++) {
-      write(STDOUT_FILENO, &m->pixels[row][col], 1);
-    }
-    write(STDOUT_FILENO, "\n", 1);
-  }
 }
 
 int main(void) {
