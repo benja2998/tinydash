@@ -16,8 +16,10 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <fcntl.h>
 #include "frame.h"
+#include "helpers.h"
+#include "render.h"
+#include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,8 +27,6 @@
 #include <sys/stat.h>
 #include <termios.h>
 #include <unistd.h>
-#include "helpers.h"
-#include "render.h"
 
 int frametime = 40000;
 
