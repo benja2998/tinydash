@@ -34,100 +34,119 @@ static struct termios old_termios;
 static int old_flags;
 int score = 0;
 
-void my_exit(void) {
-  fflush(stdout);
-  clear();
-  fflush(stdout);
+void
+my_exit (void)
+{
+  fflush (stdout);
+  clear ();
+  fflush (stdout);
   char c[1025];
 
   char filename[512];
-  char *home = getenv("HOME");
+  char *home = getenv ("HOME");
 
-  if (home == NULL) {
-    exit(1);
-  }
+  if (home == NULL)
+    {
+      exit (1);
+    }
 
-  snprintf(filename, sizeof(filename), "%s%s", home, "/tinydash_hs");
+  snprintf (filename, sizeof (filename), "%s%s", home, "/tinydash_hs");
 
   FILE *fptr;
-  if ((fptr = fopen(filename, "a+")) == NULL) {
-    printf("Error");
-    exit(1);
-  }
+  if ((fptr = fopen (filename, "a+")) == NULL)
+    {
+      printf ("Error");
+      exit (1);
+    }
 
   struct stat st;
-  if (stat(filename, &st) != 0) {
-    exit(1);
-  }
+  if (stat (filename, &st) != 0)
+    {
+      exit (1);
+    }
 
   int filesize = (int)st.st_size;
-  if (filesize == 0) {
-    fprintf(fptr, "0");
-  }
+  if (filesize == 0)
+    {
+      fprintf (fptr, "0");
+    }
 
-  fscanf(fptr, "%[^\n]", c);
-  fclose(fptr);
+  fscanf (fptr, "%[^\n]", c);
+  fclose (fptr);
 
-  if ((fptr = fopen(filename, "w+")) == NULL) {
-    printf("Error");
-    exit(1);
-  }
+  if ((fptr = fopen (filename, "w+")) == NULL)
+    {
+      printf ("Error");
+      exit (1);
+    }
 
-  int curhs = atoi(c);
+  int curhs = atoi (c);
 
-  if (score > curhs) {
-    snprintf(c, 512, "%d", score);
-  }
+  if (score > curhs)
+    {
+      snprintf (c, 512, "%d", score);
+    }
 
-  fprintf(fptr, "%s", c);
+  fprintf (fptr, "%s", c);
 
-  printf("Score: %d, High Score: %s\n", score, c);
+  printf ("Score: %d, High Score: %s\n", score, c);
 
-  exit(0);
+  exit (0);
 }
 
-void input_init(void) {
+void
+input_init (void)
+{
   struct termios new_termios;
-  tcgetattr(STDIN_FILENO, &old_termios);
+  tcgetattr (STDIN_FILENO, &old_termios);
   new_termios = old_termios;
   new_termios.c_lflag &= ~(ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &new_termios);
+  tcsetattr (STDIN_FILENO, TCSANOW, &new_termios);
 
-  old_flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-  fcntl(STDIN_FILENO, F_SETFL, old_flags | O_NONBLOCK);
+  old_flags = fcntl (STDIN_FILENO, F_GETFL, 0);
+  fcntl (STDIN_FILENO, F_SETFL, old_flags | O_NONBLOCK);
 }
 
-void input_cleanup(void) {
-  tcsetattr(STDIN_FILENO, TCSANOW, &old_termios);
-  fcntl(STDIN_FILENO, F_SETFL, old_flags);
+void
+input_cleanup (void)
+{
+  tcsetattr (STDIN_FILENO, TCSANOW, &old_termios);
+  fcntl (STDIN_FILENO, F_SETFL, old_flags);
 }
 
-int get_input(void) {
+int
+get_input (void)
+{
   char c;
 
-  if (read(STDIN_FILENO, &c, 1) == 1) {
-    return c;
-  }
+  if (read (STDIN_FILENO, &c, 1) == 1)
+    {
+      return c;
+    }
   return -1;
 }
 
-typedef struct {
+typedef struct
+{
   int row;
   int col;
 } Enemy;
 
-typedef struct {
+typedef struct
+{
   int row;
   int col;
 } Player;
 
-void map_init(struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
+void
+map_init (struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
 #ifdef THIRD_ENM
-              ,
-              Enemy *enm3
+          ,
+          Enemy *enm3
 #endif
-) {
-  memset(m->pixels, '.', sizeof m->pixels);
+)
+{
+  memset (m->pixels, '.', sizeof m->pixels);
   plr->row = ROWS / 2;
   plr->col = 0;
   enm->row = ROWS / 2;
@@ -141,137 +160,169 @@ void map_init(struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
 #endif
 }
 
-void update_map(struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
+void
+update_map (struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
 #ifdef THIRD_ENM
-                ,
-                Enemy *enm3
+            ,
+            Enemy *enm3
 #endif
-) {
-  memset(m->pixels, '.', sizeof m->pixels);
+)
+{
+  memset (m->pixels, '.', sizeof m->pixels);
 
-  if (plr->row >= 0 && plr->row < ROWS && plr->col >= 0 && plr->col < COLS) {
-    m->pixels[plr->row][plr->col] = '@';
-  }
+  if (plr->row >= 0 && plr->row < ROWS && plr->col >= 0 && plr->col < COLS)
+    {
+      m->pixels[plr->row][plr->col] = '@';
+    }
 
-  if (enm->row >= 0 && enm->row < ROWS && enm->col >= 0 && enm->col < COLS) {
-    m->pixels[enm->row][enm->col] = '1';
-  }
+  if (enm->row >= 0 && enm->row < ROWS && enm->col >= 0 && enm->col < COLS)
+    {
+      m->pixels[enm->row][enm->col] = '1';
+    }
 
-  if (enm2->row >= 0 && enm2->row < ROWS && enm2->col >= 0 &&
-      enm2->col < COLS) {
-    m->pixels[enm2->row][enm2->col] = '2';
-  }
+  if (enm2->row >= 0 && enm2->row < ROWS && enm2->col >= 0 && enm2->col < COLS)
+    {
+      m->pixels[enm2->row][enm2->col] = '2';
+    }
 
 #ifdef THIRD_ENM
-  if (enm3->row >= 0 && enm3->row < ROWS && enm3->col >= 0 &&
-      enm3->col < COLS) {
-    m->pixels[enm3->row][enm3->col] = '3';
-  }
+  if (enm3->row >= 0 && enm3->row < ROWS && enm3->col >= 0 && enm3->col < COLS)
+    {
+      m->pixels[enm3->row][enm3->col] = '3';
+    }
 #endif
 }
 
-int main(void) {
+int
+main (void)
+{
   struct FrameBuffer my_map;
-  Player plr = {0};
-  Enemy enm = {0}, enm2 = {0};
+  Player plr = { 0 };
+  Enemy enm = { 0 }, enm2 = { 0 };
 #ifdef THIRD_ENM
-  Enemy enm3 = {0};
+  Enemy enm3 = { 0 };
 #endif
 
-  map_init(&my_map, &plr, &enm, &enm2
+  map_init (&my_map, &plr, &enm, &enm2
 #ifdef THIRD_ENM
-           ,
-           &enm3
+            ,
+            &enm3
 #endif
   );
 
-  input_init();
-  atexit(input_cleanup);
+  input_init ();
+  atexit (input_cleanup);
 
   int slowdown = false;
 
-  while (1) {
-    int key = get_input();
+  while (1)
+    {
+      int key = get_input ();
 
-    if (key == ' ' && plr.row == ROWS / 2) {
-      plr.row -= JUMPPOWER;
-    } else if (key == ' ' && plr.row == ROWS + 1) {
-      plr.row -= JUMPPOWER;
-    } else if (key == ' ') {
-      plr.row = ROWS / 2;
-    }
+      if (key == ' ' && plr.row == ROWS / 2)
+        {
+          plr.row -= JUMPPOWER;
+        }
+      else if (key == ' ' && plr.row == ROWS + 1)
+        {
+          plr.row -= JUMPPOWER;
+        }
+      else if (key == ' ')
+        {
+          plr.row = ROWS / 2;
+        }
 
-    if (key == 'q') {
-      my_exit();
-    }
+      if (key == 'q')
+        {
+          my_exit ();
+        }
 
-    if (plr.row < ROWS / 2) {
-      if (slowdown == false) {
-        plr.row++;
-        slowdown = true;
-      } else {
-        slowdown = false;
-      }
-    }
+      if (plr.row < ROWS / 2)
+        {
+          if (slowdown == false)
+            {
+              plr.row++;
+              slowdown = true;
+            }
+          else
+            {
+              slowdown = false;
+            }
+        }
 
-    if (enm.col > -1) {
-      enm.col--;
-    } else {
-      enm.col = COLS;
-    }
-    if (enm2.col > -1) {
-      enm2.col--;
-    } else {
-      enm2.col = COLS + COLS / 2;
-    }
-
-#ifdef THIRD_ENM
-    if (enm3.col > -1) {
-      enm3.col--;
-    } else {
-      enm3.col = COLS + COLS;
-    }
-#endif
-
-    if (plr.row == enm.row && plr.col == enm.col) {
-      my_exit();
-    }
-
-    if (plr.row == enm2.row && plr.col == enm2.col) {
-      my_exit();
-    }
-
-#ifdef THIRD_ENM
-    if (plr.row == enm3.row && plr.col == enm3.col) {
-      my_exit();
-    }
-#endif
-
-    if (plr.col == enm.col && plr.row != enm.row) {
-      score++;
-      frametime = frametime - 10;
-    }
-
-    if (plr.col == enm2.col && plr.row != enm2.row) {
-      score++;
-      frametime = frametime - 10;
-    }
+      if (enm.col > -1)
+        {
+          enm.col--;
+        }
+      else
+        {
+          enm.col = COLS;
+        }
+      if (enm2.col > -1)
+        {
+          enm2.col--;
+        }
+      else
+        {
+          enm2.col = COLS + COLS / 2;
+        }
 
 #ifdef THIRD_ENM
-    if (plr.col == enm3.col && plr.row != enm3.row) {
-      score++;
-      frametime = frametime - 10;
-    }
+      if (enm3.col > -1)
+        {
+          enm3.col--;
+        }
+      else
+        {
+          enm3.col = COLS + COLS;
+        }
 #endif
 
-    update_map(&my_map, &plr, &enm, &enm2
+      if (plr.row == enm.row && plr.col == enm.col)
+        {
+          my_exit ();
+        }
+
+      if (plr.row == enm2.row && plr.col == enm2.col)
+        {
+          my_exit ();
+        }
+
 #ifdef THIRD_ENM
-               ,
-               &enm3
+      if (plr.row == enm3.row && plr.col == enm3.col)
+        {
+          my_exit ();
+        }
 #endif
-    );
-    map_render(&my_map);
-    usleep(frametime);
-  }
+
+      if (plr.col == enm.col && plr.row != enm.row)
+        {
+          score++;
+          frametime = frametime - 10;
+        }
+
+      if (plr.col == enm2.col && plr.row != enm2.row)
+        {
+          score++;
+          frametime = frametime - 10;
+        }
+
+#ifdef THIRD_ENM
+      if (plr.col == enm3.col && plr.row != enm3.row)
+        {
+          score++;
+          frametime = frametime - 10;
+        }
+#endif
+
+      update_map (&my_map, &plr, &enm, &enm2
+#ifdef THIRD_ENM
+                  ,
+                  &enm3
+#endif
+      );
+      map_render (&my_map);
+      usleep (frametime);
+    }
   return 0;
 }

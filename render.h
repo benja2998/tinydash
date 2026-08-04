@@ -6,6 +6,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-void map_render(struct FrameBuffer *m);
+void map_render (struct FrameBuffer *m);
 
 #endif

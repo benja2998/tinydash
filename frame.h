@@ -5,7 +5,8 @@
 #define COLS 32
 #define JUMPPOWER 4
 
-struct FrameBuffer {
+struct FrameBuffer
+{
   char pixels[ROWS][COLS];
 };
 #endif
