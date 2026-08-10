@@ -25,12 +25,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <termios.h>
 #include <unistd.h>
 
 #ifndef NUM_ENM
-#define NUM_ENM 2
+#define NUM_ENM 8
 #endif
 
 #ifndef FRAMETIME
@@ -171,7 +172,7 @@ map_init (struct FrameBuffer *m, Player *plr)
 
   for (int i = 0; i < NUM_ENM; i++)
     {
-      inc += 2;
+      inc += 4;
       ini += inc;
       Enemies[i].row = ROWS / 2;
       Enemies[i].col = ini;
@@ -202,6 +203,20 @@ update_map (struct FrameBuffer *m, Player *plr)
 int
 main (void)
 {
+  struct winsize w;
+  if (ioctl (STDOUT_FILENO, TIOCGWINSZ, &w) < 0)
+    {
+      perror ("bad terminal");
+      return 1;
+    }
+
+  if (w.ws_row < ROWS || w.ws_col < COLS)
+    {
+      fprintf (stderr, "Terminal too small!! Minimum size is %dx%d", COLS,
+               ROWS);
+      return 1;
+    }
+
   signal (SIGINT, SIG_IGN);
   struct FrameBuffer my_map;
   Player plr = { 0 };

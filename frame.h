@@ -1,8 +1,14 @@
 #ifndef FRAME_H_
 #define FRAME_H_
 
-#define ROWS 8
-#define COLS 32
+#ifndef ROWS
+#define ROWS 16
+#endif
+
+#ifndef COLS
+#define COLS 64
+#endif
+
 #define JUMPPOWER 4
 
 struct FrameBuffer
