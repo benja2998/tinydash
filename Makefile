@@ -9,4 +9,4 @@ format:
 	clang-format -i *.h
 
 install: main
-	cp -f "$(CURDIR)/main" /usr/local/bin/tinydash
+	ln -sf "$(CURDIR)/main" /usr/local/bin/tinydash

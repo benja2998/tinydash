@@ -28,11 +28,15 @@
 #include <termios.h>
 #include <unistd.h>
 
-int frametime = 40000;
-
 #ifndef NUM_ENM
 #define NUM_ENM 2
 #endif
+
+#ifndef FRAMETIME
+#define FRAMETIME 40000
+#endif
+
+int frametime = FRAMETIME;
 
 static struct termios old_termios;
 static int old_flags;
@@ -76,6 +80,7 @@ my_exit (void)
     }
 
   fscanf (fptr, "%[^\n]", c);
+  fflush (fptr);
   fclose (fptr);
 
   if ((fptr = fopen (filename, "w+")) == NULL)
@@ -92,6 +97,9 @@ my_exit (void)
     }
 
   fprintf (fptr, "%s", c);
+
+  fflush (fptr);
+  fclose (fptr);
 
   printf ("Score: %d, High Score: %s\n", score, c);
 
@@ -240,6 +248,12 @@ main (void)
               my_exit ();
             }
 
+          if (Enemies[i].row != plr.row && Enemies[i].col == plr.col)
+            {
+              score++;
+              frametime -= 10;
+            }
+
           if (Enemies[i].col > -1)
             {
               Enemies[i].col--;
@@ -252,6 +266,10 @@ main (void)
 
       update_map (&my_map, &plr);
       map_render (&my_map);
+      if (frametime <= 100)
+        {
+          frametime = FRAMETIME;
+        }
       usleep (frametime);
     }
   return 0;
