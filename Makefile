@@ -1,4 +1,5 @@
 CFLAGS :=
+INSTDIR ?= /usr/local/bin
 
 build: main.c format
 	clang -o main *.c -Wextra -Wall -Werror -pedantic -O3 -march=native $(CFLAGS) -fsanitize=address
@@ -9,4 +10,4 @@ format:
 	clang-format -i *.h
 
 install: main
-	ln -sf "$(CURDIR)/main" /usr/local/bin/tinydash
+	ln -sf "$(CURDIR)/main" $(INSTDIR)/tinydash
