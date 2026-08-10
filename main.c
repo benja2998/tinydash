@@ -20,6 +20,7 @@
 #include "helpers.h"
 #include "render.h"
 #include <fcntl.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -117,6 +118,8 @@ input_init (void)
   new_termios.c_lflag &= ~(ICANON | ECHO);
   tcsetattr (STDIN_FILENO, TCSANOW, &new_termios);
 
+  printf ("\033[?25l");
+
   old_flags = fcntl (STDIN_FILENO, F_GETFL, 0);
   fcntl (STDIN_FILENO, F_SETFL, old_flags | O_NONBLOCK);
 }
@@ -126,6 +129,7 @@ input_cleanup (void)
 {
   tcsetattr (STDIN_FILENO, TCSANOW, &old_termios);
   fcntl (STDIN_FILENO, F_SETFL, old_flags);
+  printf ("\033[?25h");
 }
 
 int
@@ -198,6 +202,7 @@ update_map (struct FrameBuffer *m, Player *plr)
 int
 main (void)
 {
+  signal (SIGINT, SIG_IGN);
   struct FrameBuffer my_map;
   Player plr = { 0 };
 
