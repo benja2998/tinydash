@@ -103,6 +103,8 @@ my_exit (void)
 
   printf ("Score: %d, High Score: %s\n", score, c);
 
+  sleep (2);
+
   exit (0);
 }
 
