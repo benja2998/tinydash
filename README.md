@@ -12,4 +12,8 @@ Simply run make install. You need to be root.
 
 ## Configuration
 
-You can optionally add a third enemy, using make `CFLAGS=-DTHIRD_ENM`.
+You can increase the number of enemies to make it harder for yourself by compiling like this:
+```bash
+# $X is what you want the number of enemies to be
+make CFLAGS=-DNUM_ENM=$X
+```

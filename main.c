@@ -30,6 +30,10 @@
 
 int frametime = 40000;
 
+#ifndef NUM_ENM
+#define NUM_ENM 2
+#endif
+
 static struct termios old_termios;
 static int old_flags;
 int score = 0;
@@ -130,7 +134,10 @@ typedef struct
 {
   int row;
   int col;
+  int ini;
 } Enemy;
+
+Enemy Enemies[NUM_ENM] = { 0 };
 
 typedef struct
 {
@@ -139,34 +146,27 @@ typedef struct
 } Player;
 
 void
-map_init (struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
-#ifdef THIRD_ENM
-          ,
-          Enemy *enm3
-#endif
-)
+map_init (struct FrameBuffer *m, Player *plr)
 {
-  memset (m->pixels, '.', sizeof m->pixels);
+  memset (m->pixels, '.', sizeof (m->pixels));
   plr->row = ROWS / 2;
   plr->col = 0;
-  enm->row = ROWS / 2;
-  enm->col = COLS / 2;
 
-  enm2->row = ROWS / 2;
-  enm2->col = COLS;
-#ifdef THIRD_ENM
-  enm3->row = ROWS / 2;
-  enm3->col = COLS + COLS / 2;
-#endif
+  int ini = COLS;
+  int inc = 1;
+
+  for (int i = 0; i < NUM_ENM; i++)
+    {
+      inc += 2;
+      ini += inc;
+      Enemies[i].row = ROWS / 2;
+      Enemies[i].col = ini;
+      Enemies[i].ini = ini;
+    }
 }
 
 void
-update_map (struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
-#ifdef THIRD_ENM
-            ,
-            Enemy *enm3
-#endif
-)
+update_map (struct FrameBuffer *m, Player *plr)
 {
   memset (m->pixels, '.', sizeof m->pixels);
 
@@ -175,22 +175,14 @@ update_map (struct FrameBuffer *m, Player *plr, Enemy *enm, Enemy *enm2
       m->pixels[plr->row][plr->col] = '@';
     }
 
-  if (enm->row >= 0 && enm->row < ROWS && enm->col >= 0 && enm->col < COLS)
+  for (int i = 0; i < NUM_ENM; ++i)
     {
-      m->pixels[enm->row][enm->col] = '1';
+      if (Enemies[i].row >= 0 && Enemies[i].row < ROWS && Enemies[i].col >= 0
+          && Enemies[i].col < COLS)
+        {
+          m->pixels[Enemies[i].row][Enemies[i].col] = '$';
+        }
     }
-
-  if (enm2->row >= 0 && enm2->row < ROWS && enm2->col >= 0 && enm2->col < COLS)
-    {
-      m->pixels[enm2->row][enm2->col] = '2';
-    }
-
-#ifdef THIRD_ENM
-  if (enm3->row >= 0 && enm3->row < ROWS && enm3->col >= 0 && enm3->col < COLS)
-    {
-      m->pixels[enm3->row][enm3->col] = '3';
-    }
-#endif
 }
 
 int
@@ -198,17 +190,8 @@ main (void)
 {
   struct FrameBuffer my_map;
   Player plr = { 0 };
-  Enemy enm = { 0 }, enm2 = { 0 };
-#ifdef THIRD_ENM
-  Enemy enm3 = { 0 };
-#endif
 
-  map_init (&my_map, &plr, &enm, &enm2
-#ifdef THIRD_ENM
-            ,
-            &enm3
-#endif
-  );
+  map_init (&my_map, &plr);
 
   input_init ();
   atexit (input_cleanup);
@@ -250,77 +233,24 @@ main (void)
             }
         }
 
-      if (enm.col > -1)
+      for (int i = 0; i < NUM_ENM; ++i)
         {
-          enm.col--;
-        }
-      else
-        {
-          enm.col = COLS;
-        }
-      if (enm2.col > -1)
-        {
-          enm2.col--;
-        }
-      else
-        {
-          enm2.col = COLS + COLS / 2;
+          if (Enemies[i].row == plr.row && Enemies[i].col == plr.col)
+            {
+              my_exit ();
+            }
+
+          if (Enemies[i].col > -1)
+            {
+              Enemies[i].col--;
+            }
+          else
+            {
+              Enemies[i].col = Enemies[i].ini;
+            }
         }
 
-#ifdef THIRD_ENM
-      if (enm3.col > -1)
-        {
-          enm3.col--;
-        }
-      else
-        {
-          enm3.col = COLS + COLS;
-        }
-#endif
-
-      if (plr.row == enm.row && plr.col == enm.col)
-        {
-          my_exit ();
-        }
-
-      if (plr.row == enm2.row && plr.col == enm2.col)
-        {
-          my_exit ();
-        }
-
-#ifdef THIRD_ENM
-      if (plr.row == enm3.row && plr.col == enm3.col)
-        {
-          my_exit ();
-        }
-#endif
-
-      if (plr.col == enm.col && plr.row != enm.row)
-        {
-          score++;
-          frametime = frametime - 10;
-        }
-
-      if (plr.col == enm2.col && plr.row != enm2.row)
-        {
-          score++;
-          frametime = frametime - 10;
-        }
-
-#ifdef THIRD_ENM
-      if (plr.col == enm3.col && plr.row != enm3.row)
-        {
-          score++;
-          frametime = frametime - 10;
-        }
-#endif
-
-      update_map (&my_map, &plr, &enm, &enm2
-#ifdef THIRD_ENM
-                  ,
-                  &enm3
-#endif
-      );
+      update_map (&my_map, &plr);
       map_render (&my_map);
       usleep (frametime);
     }

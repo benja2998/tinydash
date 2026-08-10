@@ -1,0 +1,8 @@
+#!/bin/bash
+shopt -s nullglob
+shopt -s extglob
+shopt -s globstar
+set -euo pipefail
+
+ctags *.[ch] /${PREFIX:-usr}/include/*.h
+ctags -e *.[ch] /${PREFIX:-usr}/include/*.h
