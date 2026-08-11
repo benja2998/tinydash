@@ -203,20 +203,6 @@ update_map (struct FrameBuffer *m, Player *plr)
 int
 main (void)
 {
-  struct winsize w;
-  if (ioctl (STDOUT_FILENO, TIOCGWINSZ, &w) < 0)
-    {
-      perror ("bad terminal");
-      return 1;
-    }
-
-  if (w.ws_row < ROWS || w.ws_col < COLS)
-    {
-      fprintf (stderr, "Terminal too small!! Minimum size is %dx%d", COLS,
-               ROWS);
-      return 1;
-    }
-
   signal (SIGINT, SIG_IGN);
   struct FrameBuffer my_map;
   Player plr = { 0 };
