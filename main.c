@@ -289,7 +289,7 @@ main (void)
               "This program comes with ABSOLUTELY NO WARRANTY; for details "
               "type `w'.\n"
               "This is free software, and you are welcome to redistribute it\n"
-              "under certain conditions; see the `LICENSE.md' file included "
+              "under certain conditions; see the `LICENSE' file included "
               "in the distribution for details.\n"
               "Type `b' to break out of this screen.\n");
 
