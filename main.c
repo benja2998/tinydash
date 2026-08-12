@@ -49,6 +49,8 @@ static struct termios old_termios;
 static int old_flags;
 int score = 0;
 
+int get_input (void);
+
 void
 my_exit (void)
 {
@@ -108,9 +110,28 @@ my_exit (void)
   fflush (fptr);
   fclose (fptr);
 
-  printf ("Score: %d, High Score: %s\n", score, c);
+  printf ("\033[38;5;215m"
+          "\033[48;5;0m"
+          "   ____                         ___                 _  \n"
+          "  / ___| __ _ _ __ ___   ___   / _ \\__   _____ _ __| | \n"
+          " | |  _ / _` | '_ ` _ \\ / _ \\ | | | \\ \\ / / _ \\ '__| | \n"
+          " | |_| | (_| | | | | | |  __/ | |_| |\\ V /  __/ |  |_| \n"
+          "  \\____|\\__,_|_| |_| |_|\\___|  \\___/  \\_/ \\___|_|  (_) \n"
+          "                                                       \n"
+          "\033[0m"
+          "\n");
 
-  sleep (2);
+  printf ("Score: %d, High Score: %s\n", score, c);
+  printf ("Press enter to return to your terminal.\n");
+
+  while (1)
+    {
+      if (get_input () == '\n')
+        {
+          break;
+        }
+      usleep (FRAMETIME);
+    }
 
   exit (0);
 }
@@ -257,6 +278,56 @@ main (void)
   bool slowdown = false;
   bool background_slowdown = true;
   bool hasslowed = false;
+  bool tobreak = false;
+
+  while (1)
+    {
+      if (tobreak)
+        break;
+      clear ();
+      printf ("tinydash  Copyright (C) 2026  benja2998\n"
+              "This program comes with ABSOLUTELY NO WARRANTY; for details "
+              "type `w'.\n"
+              "This is free software, and you are welcome to redistribute it\n"
+              "under certain conditions; see the `LICENSE.md' file included "
+              "in the distribution for details.\n"
+              "Type `b' to break out of this screen.\n");
+
+      int key = get_input ();
+      switch (key)
+        {
+        case 'w':
+          clear ();
+          printf (
+              "THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED "
+              "BY\n"
+              "APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE "
+              "COPYRIGHT\n"
+              "HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" "
+              "WITHOUT\n"
+              "WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, "
+              "BUT "
+              "NOT\n"
+              "LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND "
+              "FITNESS "
+              "FOR\n"
+              "A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND\n"
+              "PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM "
+              "PROVE\n"
+              "DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, "
+              "REPAIR "
+              "OR\n"
+              "CORRECTION.\n");
+          sleep (5);
+          break;
+        case 'b':
+          tobreak = true;
+          break;
+        default:
+          break;
+        }
+      usleep (FRAMETIME);
+    }
 
   while (1)
     {
