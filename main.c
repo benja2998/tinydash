@@ -422,7 +422,7 @@ main (void)
         }
 
       update_map (&my_map, &plr);
-      map_render (&my_map);
+      map_render (&my_map, score);
       if (frametime <= 100)
         {
           frametime = FRAMETIME;

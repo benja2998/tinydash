@@ -19,7 +19,7 @@
 #include "render.h"
 
 void
-map_render (struct FrameBuffer *m)
+map_render (struct FrameBuffer *m, int score)
 {
   clear ();
   fflush (stdout);
@@ -64,4 +64,5 @@ map_render (struct FrameBuffer *m)
 
   fflush (stdout);
   printf ("space to jump - q to quit\n");
+  printf ("score: %d\n", score);
 }

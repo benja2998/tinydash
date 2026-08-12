@@ -25,6 +25,6 @@
 #include <string.h>
 #include <unistd.h>
 
-void map_render (struct FrameBuffer *m);
+void map_render (struct FrameBuffer *m, int score);
 
 #endif
