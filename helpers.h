@@ -18,6 +18,15 @@
 
 #ifndef HELPERS_H_
 #define HELPERS_H_
+
+#define GAM "\033[38;2;255;170;127m"
+#define PLR "\033[48;2;105;228;255m"
+#define ENM "\033[48;2;231;194;119m"
+#define STR "\033[38;2;255;255;127m"
+#define RST "\033[0m"
+#define GRD "\033[48;2;57;130;23m"
+#define BCK "\033[48;2;0;0;0m"
+
 #include <stdio.h>
 void clear (void);
 #endif

@@ -27,37 +27,40 @@ map_render (struct FrameBuffer *m, int score)
     {
       for (int col = 0; col < COLS; col++)
         {
-          if (m->pixels[row][col] == '@')
+          switch (m->pixels[row][col])
             {
-              write (STDOUT_FILENO, "\033[38;5;123m",
-                     strlen ("\033[38;5;123m"));
-              write (STDOUT_FILENO, "\033[48;5;0m", strlen ("\033[48;5;0m"));
-            }
-          else if (m->pixels[row][col] == '$')
-            {
-              write (STDOUT_FILENO, "\033[38;5;208m",
-                     strlen ("\033[38;5;208m"));
-              write (STDOUT_FILENO, "\033[48;5;0m", strlen ("\033[48;5;0m"));
-            }
-          else if (m->pixels[row][col] == '*')
-            {
-              write (STDOUT_FILENO, "\033[38;5;227m",
-                     strlen ("\033[38;5;227m"));
-              write (STDOUT_FILENO, "\033[48;5;0m", strlen ("\033[48;5;0m"));
-            }
-          else if (m->pixels[row][col] == '%')
-            {
-              write (STDOUT_FILENO, "\033[38;5;64m", strlen ("\033[38;5;64m"));
-              write (STDOUT_FILENO, "\033[48;5;64m", strlen ("\033[48;5;64m"));
-            }
-          else if (m->pixels[row][col] == '.')
-            {
-              write (STDOUT_FILENO, "\033[48;5;0m", strlen ("\033[48;5;0m"));
+            case '@':
+              write (STDOUT_FILENO, PLR, strlen (PLR));
+              break;
+            case '$':
+              write (STDOUT_FILENO, ENM, strlen (ENM));
+              break;
+            case '*':
+              write (STDOUT_FILENO, STR, strlen (STR));
+              write (STDOUT_FILENO, BCK, strlen (BCK));
+              break;
+            case '%':
+              write (STDOUT_FILENO, GRD, strlen (GRD));
+              break;
+            case '.':
+              write (STDOUT_FILENO, BCK, strlen (BCK));
+              break;
+            default:
+              break;
             }
 
-          write (STDOUT_FILENO, &m->pixels[row][col], 1);
+          switch (m->pixels[row][col])
+            {
+            case '*':
+              write (STDOUT_FILENO, "*", 1);
+              break;
+            default:
+              write (STDOUT_FILENO, " ", 1);
+              break;
+            }
+
           fflush (stdout);
-          write (STDOUT_FILENO, "\033[0m", 4);
+          write (STDOUT_FILENO, RST, 4);
         }
       write (STDOUT_FILENO, "\n", 1);
     }
@@ -70,6 +73,7 @@ map_render (struct FrameBuffer *m, int score)
           "\n"
           "space while one row above\n"
           "the ground will double jump\n"
+          "\n" ENM " " RST " - enemy, " PLR " " RST " - player\n"
           "\n");
   printf ("score: %d\n", score);
 }

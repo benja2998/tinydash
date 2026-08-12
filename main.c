@@ -32,7 +32,7 @@
 #include <unistd.h>
 
 #ifndef NUM_ENM
-#define NUM_ENM 8
+#define NUM_ENM 5
 #endif
 
 #ifndef NUM_STR
@@ -110,8 +110,7 @@ my_exit (void)
   fflush (fptr);
   fclose (fptr);
 
-  printf ("\033[38;5;215m"
-          "\033[48;5;0m"
+  printf (GAM BCK
           "   ____                         ___                 _  \n"
           "  / ___| __ _ _ __ ___   ___   / _ \\__   _____ _ __| | \n"
           " | |  _ / _` | '_ ` _ \\ / _ \\ | | | \\ \\ / / _ \\ '__| | \n"

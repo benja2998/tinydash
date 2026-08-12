@@ -4,7 +4,7 @@ tinydash is a tiny terminal-based game similar to "Geometry Dash".  It uses only
 
 ## Usage
 
-Build it with make, then run ./main.  To play, press space to jump before the number symbols hit your character, the @ symbol.
+Build it with make, then run ./main.  Jump over the enemies to increase your score.
 
 If your character is at 1 row above the ground, you can press space again within the frame to double jump.
 You can press space while jumping to instantly go down.
