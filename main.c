@@ -28,10 +28,15 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 
 #ifndef NUM_ENM
 #define NUM_ENM 8
+#endif
+
+#ifndef NUM_STR
+#define NUM_STR ROWS / 4 + (ROWS / 2)
 #endif
 
 #ifndef FRAMETIME
@@ -160,6 +165,14 @@ typedef struct
   int col;
 } Player;
 
+typedef struct
+{
+  int row;
+  int col;
+} Star;
+
+Star Stars[NUM_STR] = { 0 };
+
 void
 map_init (struct FrameBuffer *m, Player *plr)
 {
@@ -178,12 +191,40 @@ map_init (struct FrameBuffer *m, Player *plr)
       Enemies[i].col = ini;
       Enemies[i].ini = ini;
     }
+
+  for (int i = 0; i < NUM_STR; i++)
+    {
+      int row = rand () % (ROWS + 1);
+      int col = rand () % (COLS + 1);
+      Stars[i].row = row;
+      Stars[i].col = col;
+    }
 }
 
 void
 update_map (struct FrameBuffer *m, Player *plr)
 {
   memset (m->pixels, '.', sizeof m->pixels);
+
+  for (int i = 0; i < NUM_STR; ++i)
+    {
+      if (Stars[i].row >= 0 && Stars[i].row < ROWS && Stars[i].col >= 0
+          && Stars[i].col < COLS)
+        {
+          m->pixels[Stars[i].row][Stars[i].col] = '*';
+        }
+    }
+
+  for (int i = 0; i < ROWS; i++)
+    {
+      for (int j = 0; j < COLS; j++)
+        {
+          if (i >= (ROWS / 2) + 1)
+            {
+              m->pixels[i][j] = '%';
+            }
+        }
+    }
 
   if (plr->row >= 0 && plr->row < ROWS && plr->col >= 0 && plr->col < COLS)
     {
@@ -203,6 +244,7 @@ update_map (struct FrameBuffer *m, Player *plr)
 int
 main (void)
 {
+  srand (time (0));
   signal (SIGINT, SIG_IGN);
   struct FrameBuffer my_map;
   Player plr = { 0 };
@@ -212,7 +254,9 @@ main (void)
   input_init ();
   atexit (input_cleanup);
 
-  int slowdown = false;
+  bool slowdown = false;
+  bool background_slowdown = true;
+  bool hasslowed = false;
 
   while (1)
     {
@@ -222,7 +266,7 @@ main (void)
         {
           plr.row -= JUMPPOWER;
         }
-      else if (key == ' ' && plr.row == ROWS + 1)
+      else if (key == ' ' && plr.row == (ROWS / 2) - 1)
         {
           plr.row -= JUMPPOWER;
         }
@@ -259,7 +303,7 @@ main (void)
           if (Enemies[i].row != plr.row && Enemies[i].col == plr.col)
             {
               score++;
-              frametime -= 10;
+              frametime -= 100;
             }
 
           if (Enemies[i].col > -1)
@@ -269,6 +313,32 @@ main (void)
           else
             {
               Enemies[i].col = Enemies[i].ini;
+            }
+        }
+
+      if (background_slowdown == false && hasslowed == true)
+        {
+          background_slowdown = true;
+          hasslowed = false;
+        }
+      else if (background_slowdown == true && hasslowed == false)
+        {
+          background_slowdown = false;
+          hasslowed = true;
+        }
+
+      for (int i = 0; i < NUM_STR; ++i)
+        {
+          if (Stars[i].col > -1)
+            {
+              if (background_slowdown == false)
+                {
+                  Stars[i].col--;
+                }
+            }
+          else
+            {
+              Stars[i].col = COLS;
             }
         }
 
