@@ -317,8 +317,16 @@ main (void)
               "DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, "
               "REPAIR "
               "OR\n"
-              "CORRECTION.\n");
-          sleep (5);
+              "CORRECTION.\n"
+              "Press enter to return to previous screen\n");
+          while (1)
+            {
+              if (get_input () == '\n')
+                {
+                  break;
+                }
+              usleep (FRAMETIME);
+            }
           break;
         case 'b':
           tobreak = true;

@@ -1,17 +1,17 @@
 # tinydash
 
-tinydash is a tiny terminal-based game similar to "Geometry Dash". It uses only standard POSIX libraries and can practically run on any system.
+tinydash is a tiny terminal-based game similar to "Geometry Dash".  It uses only standard POSIX libraries and can practically run on any system.
 
 ## Usage
 
-Build it with make, then run ./main. To play, press space to jump before the number symbols hit your character, the @ symbol.
+Build it with make, then run ./main.  To play, press space to jump before the number symbols hit your character, the @ symbol.
 
 If your character is at 1 row above the ground, you can press space again within the frame to double jump.
 You can press space while jumping to instantly go down.
 
 ## Installing
 
-Simply run make install. You need to be root.
+Simply run make install.  You need to be root.
 
 ## Configuration
 
