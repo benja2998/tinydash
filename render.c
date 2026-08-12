@@ -63,6 +63,13 @@ map_render (struct FrameBuffer *m, int score)
     }
 
   fflush (stdout);
-  printf ("space to jump - q to quit\n");
+  printf ("space to jump - q to quit\n"
+          "\n"
+          "space while in air will\n"
+          "go down instantly\n"
+          "\n"
+          "space while one row above\n"
+          "the ground will double jump\n"
+          "\n");
   printf ("score: %d\n", score);
 }
